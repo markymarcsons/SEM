@@ -17,8 +17,27 @@ summary(fit, standardized=TRUE)
 #SRMR = 0.099#RMSEA = 0.081 # TLI=0.936 #CFI=0.956 # chi2=0.132
 
 #discriminant and convergent valdity 
-condisc(fit) # ave_ext<0.5#we can accept 0.4. Because Fornell and Larcker said that if AVE is less than 0.5 becazse aplh accpetable(Fornell & Larcker, 1981)
+condisc <- function(x){
+  std.loadings<- inspect(x, what="std")$lambda
+  #std.loadings
+  std.loadings[std.loadings==0] <- NA
+  #std.loadings
+  std.loadings <- std.loadings^2
+  #std.loadings
+  ave <- colMeans(std.loadings, na.rm=TRUE)
+  #ave
+  #factor correlation matrix
+  fcor <- lavInspect(x, "cor.lv")
+  #fcor
+  sqfcor <- fcor^2
+  #sqfcor
+  list(Squared_Factor_Correlation=round(sqfcor, digits=3),
+       Average_Variance_Extracted=round(ave, digits=3))
+}
+
+condisc(fit) # ave_ext<0.5 we can accept 0.4. Because Fornell and Larcker said that if AVE is less than 0.5 because aplha accpetable(Fornell & Larcker, 1981)
 library(psych)
+
 ### cronbach validity internal consistency
 alpha(subset(my_data, select=c(rew2,con2,con1,rec2)))#0.61 acceptable 
 alpha(subset(my_data, select=c(com1,com2,sup2,sup3)))# 0.87 very good
@@ -31,9 +50,6 @@ inspect(fit, what="std")
 
 #r square
 inspect(fit,'r2')
-
-
-
 
 
 #Sem path Diagramm
